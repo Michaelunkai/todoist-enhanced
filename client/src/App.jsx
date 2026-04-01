@@ -101,6 +101,9 @@ function AppInner() {
   const handleSearch = (query) => { setSearchQuery(query) }
   const handleAddTask = () => { setQuickAddOpen(true) }
   const toggleDark = toggleTheme
+  const handleSearchNavigate = ({ type, item }) => {
+    showToast(`Navigating to ${type}: ${item.title || item.name}`)
+  }
 
   // Timer strip progress (0–1): how far through the 25-min work block
   const timerProgress = Math.max(0, Math.min(1, 1 - timeRemaining / WORK_SECONDS))
@@ -132,6 +135,7 @@ function AppInner() {
         onAddTask={handleAddTask}
         onToggleDark={toggleDark}
         onToggleFocusMode={toggleFocusMode}
+        onSearchNavigate={handleSearchNavigate}
         isFocusMode={isFocusMode}
         darkMode={darkMode}
         sidebarOpen={sidebarOpen}
@@ -153,14 +157,7 @@ function AppInner() {
         <PomodoroTimer onExit={toggleFocusMode} />
       )}
 
-      <QuickAddModal
-        isOpen={quickAddOpen}
-        onClose={() => setQuickAddOpen(false)}
-        onSubmit={handleQuickAddSubmit}
-        onTaskAdded={fetchTasks}
-      />
-
-      {/* QuickAddTask — alternate modal triggered by Q key or + button */}
+      {/* QuickAddTask modal — triggered by Q key, + key, or the + Add Task button */}
       <QuickAddTask
         isOpen={quickAddOpen}
         onClose={() => setQuickAddOpen(false)}

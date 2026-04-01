@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import ProjectPicker from './ProjectPicker'
+import RecurringPicker from './RecurringPicker'
 
 const API_BASE = 'http://localhost:3456'
 
@@ -25,6 +26,7 @@ export default function TaskDetailPanel({ task, onClose, onUpdated, onDeleted })
   const [projectId, setProjectId] = useState('')
   const [sectionId, setSectionId] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [recurring, setRecurring] = useState(null)
   const [priority, setPriority] = useState(4)
   const [labels, setLabels] = useState([]) // all available labels
   const [selectedLabelIds, setSelectedLabelIds] = useState([]) // ids of selected labels
@@ -47,6 +49,7 @@ export default function TaskDetailPanel({ task, onClose, onUpdated, onDeleted })
     setProjectId(task.project_id ? String(task.project_id) : '')
     setSectionId(task.section_id ? String(task.section_id) : '')
     setDueDate(task.due_date || '')
+    setRecurring(task.recurring || null)
     setPriority(task.priority || 4)
     setSelectedLabelIds((task.labels || []).map((l) => String(l.id || l)))
     setSaveError('')
@@ -119,6 +122,7 @@ export default function TaskDetailPanel({ task, onClose, onUpdated, onDeleted })
         project_id: projectId || null,
         section_id: sectionId || null,
         due_date: dueDate || null,
+        recurring: recurring || null,
         priority,
         labels: selectedLabelIds,
       }

@@ -59,6 +59,7 @@ function formatDueDate(rawDate) {
 /**
  * TaskItem — renders a single task row with right-click context menu support
  * and inline title editing (click title to edit in-place).
+ * Supports nested sub-tasks: fetches /api/tasks?parent_id=X on expand.
  *
  * Props:
  *   task             {object}  task data
@@ -68,6 +69,7 @@ function formatDueDate(rawDate) {
  *   onDeleted        {fn}      (taskId) => void
  *   onToggleComplete {fn}      (task) => void
  *   onInlineUpdated  {fn}      (updatedTask) => void  — called after inline save
+ *   depth            {number}  nesting depth — 0 = top-level, 1+ = sub-task
  */
 export default function TaskItem({
   task,
@@ -77,12 +79,72 @@ export default function TaskItem({
   onDeleted,
   onToggleComplete,
   onInlineUpdated,
+  depth = 0,
 }) {
   const [contextMenu, setContextMenu] = useState(null) // { x, y } or null
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(task.title)
   const [isSaving, setIsSaving] = useState(false)
   const inputRef = useRef(null)
+
+  // Sub-tasks state
+  const [expanded, setExpanded] = useState(false)
+  const [subTasks, setSubTasks] = useState([])
+  const [loadingSubTasks, setLoadingSubTasks] = useState(false)
+  const childCount = task.child_task_count || 0
+
+  const fetchSubTasks = useCallback(async () => {
+    setLoadingSubTasks(true)
+    try {
+      const res = await fetch(
+        `http://localhost:3456/api/tasks?parent_id=${task.id}`,
+        { credentials: 'include' }
+      )
+      if (res.ok) {
+        const data = await res.json()
+        setSubTasks(data.tasks || [])
+      }
+    } catch (err) {
+      console.error('Failed to fetch sub-tasks:', err)
+    } finally {
+      setLoadingSubTasks(false)
+    }
+  }, [task.id])
+
+  const handleToggleExpand = useCallback(async (e) => {
+    e.stopPropagation()
+    const next = !expanded
+    setExpanded(next)
+    if (next) {
+      await fetchSubTasks()
+    }
+  }, [expanded, fetchSubTasks])
+
+  // Refresh sub-tasks when child count changes (after task edits)
+  useEffect(() => {
+    if (expanded && childCount > 0) {
+      fetchSubTasks()
+    }
+  }, [childCount]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSubTaskToggleComplete = useCallback(async (subTask) => {
+    try {
+      await fetch(`http://localhost:3456/api/tasks/${subTask.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ completed: !subTask.completed }),
+      })
+      await fetchSubTasks()
+    } catch (err) {
+      console.error('Toggle sub-task complete failed:', err)
+    }
+  }, [fetchSubTasks])
+
+  const handleSubRefresh = useCallback(async () => {
+    await fetchSubTasks()
+    onDeleted && onDeleted()
+  }, [fetchSubTasks, onDeleted])
 
   // Keep editValue in sync if task.title changes externally
   useEffect(() => {
@@ -163,23 +225,49 @@ export default function TaskItem({
   const priorityColor = PRIORITY_COLORS[task.priority] || PRIORITY_COLORS[4]
   const priorityLabel = PRIORITY_LABELS[task.priority] || 'P4'
 
+  // Indentation: 32px per depth level (pl-8 = 2rem = 32px in Tailwind)
+  const indentStyle = depth > 0 ? { paddingLeft: `${depth * 2}rem` } : {}
+
   return (
     <>
-      <div
-        onContextMenu={handleContextMenu}
-        className={[
-          'group flex items-start gap-3 px-3 py-2.5 rounded-lg cursor-default select-none',
-          'hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors',
-          task.completed ? 'opacity-50' : '',
-        ].join(' ')}
-        role="listitem"
-        aria-label={task.title}
-      >
-        {/* Completion checkbox */}
-        <button
-          type="button"
-          aria-label={task.completed ? 'Mark incomplete' : 'Mark complete'}
-          onClick={() => onToggleComplete && onToggleComplete(task)}
+      <div style={indentStyle}>
+        <div
+          onContextMenu={handleContextMenu}
+          className={[
+            'group flex items-start gap-2 px-3 py-2.5 rounded-lg cursor-default select-none',
+            'hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors',
+            task.completed ? 'opacity-50' : '',
+          ].join(' ')}
+          role="listitem"
+          aria-label={task.title}
+        >
+          {/* Expand/collapse arrow for tasks with child tasks */}
+          <div className="flex-shrink-0 w-4 h-5 flex items-center justify-center mt-0.5">
+            {childCount > 0 && (
+              <button
+                type="button"
+                aria-label={expanded ? 'Collapse sub-tasks' : 'Expand sub-tasks'}
+                onClick={handleToggleExpand}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none"
+                style={{
+                  transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.15s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7.293 4.707a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L11.586 10 7.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Completion checkbox */}
+          <button
+            type="button"
+            aria-label={task.completed ? 'Mark incomplete' : 'Mark complete'}
+            onClick={() => onToggleComplete && onToggleComplete(task)}
           className={[
             'mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1',
             task.completed

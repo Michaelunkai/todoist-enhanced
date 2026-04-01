@@ -166,22 +166,45 @@ export default function Sidebar({ activeProjectId, onSelectProject, token }) {
   return (
     <>
     <div className="flex flex-col h-full overflow-y-auto py-4 px-2 space-y-1">
-      {/* Projects header with Add button */}
+      {/* Projects header with Add button + theme toggle */}
       <div className="flex items-center justify-between px-3 mb-1">
         <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
           Projects
         </p>
-        <button
-          type="button"
-          onClick={() => setShowCreateDialog(true)}
-          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors rounded p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700"
-          aria-label="Add project"
-          title="Add project"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Theme toggle button */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors rounded p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700"
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDark ? (
+              /* Sun icon — click to go light */
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+              </svg>
+            ) : (
+              /* Moon icon — click to go dark */
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+              </svg>
+            )}
+          </button>
+          {/* Add project button */}
+          <button
+            type="button"
+            onClick={() => setShowCreateDialog(true)}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors rounded p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700"
+            aria-label="Add project"
+            title="Add project"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Inbox (not draggable) */}
