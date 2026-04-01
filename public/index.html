@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoMich - Smart Task Manager</title>
+    <link rel="stylesheet" href="styles-new.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">✓ TodoMich</h1>
+            </div>
+
+            <!-- Main Navigation -->
+            <nav class="nav-section">
+                <div class="nav-item active" data-view="inbox">
+                    <div class="nav-item-content">
+                        <span class="nav-icon">📥</span>
+                        <span>Inbox</span>
+                    </div>
+                    <span class="nav-count">0</span>
+                </div>
+                <div class="nav-item" data-view="today">
+                    <div class="nav-item-content">
+                        <span class="nav-icon">📅</span>
+                        <span>Today</span>
+                    </div>
+                    <span class="nav-count">0</span>
+                </div>
+                <div class="nav-item" data-view="upcoming">
+                    <div class="nav-item-content">
+                        <span class="nav-icon">📆</span>
+                        <span>Upcoming</span>
+                    </div>
+                    <span class="nav-count">0</span>
+                </div>
+                <div class="nav-item" data-view="completed">
+                    <div class="nav-item-content">
+                        <span class="nav-icon">✅</span>
+                        <span>Completed</span>
+                    </div>
+                    <span class="nav-count">0</span>
+                </div>
+            </nav>
+
+            <!-- Projects -->
+            <div class="projects-section">
+                <div class="section-header">
+                    <span class="section-title">Projects</span>
+                    <button id="add-project-btn">+</button>
+                </div>
+                <div id="projects-list"></div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h2 id="view-title">Inbox</h2>
+                <div class="header-actions">
+                    <button id="quick-add-btn" class="btn btn-primary">+ Add Task</button>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <input 
+                    type="text" 
+                    id="quick-add-input" 
+                    placeholder="What do you need to do?"
+                    autocomplete="off"
+                />
+                <div id="task-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app-new.js"></script>
+</body>
+</html>

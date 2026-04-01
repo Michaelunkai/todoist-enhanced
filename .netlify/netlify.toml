@@ -1,0 +1,26 @@
+plugins = []
+headers = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "F:\\study\\projects\\Web_Development\\Fullstack\\todoist-enhanced"
+publishOrigin = "default"
+base = "F:\\study\\projects\\Web_Development\\Fullstack\\todoist-enhanced"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]

@@ -1,0 +1,61 @@
+/* Dark Mode Theme */
+body.dark-mode {
+    --primary: #eb5545;
+    --primary-hover: #ff6b59;
+    --secondary: #4a8ef5;
+    --success: #25b84c;
+    --warning: #ffc107;
+    --bg-main: #1e1e1e;
+    --bg-secondary: #282828;
+    --bg-hover: #333;
+    --border: #444;
+    --text-primary: #e0e0e0;
+    --text-secondary: #aaa;
+    --shadow: 0 2px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 4px 24px rgba(0,0,0,0.6);
+}
+
+/* Dark mode toggle button */
+.dark-mode-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dark-mode-toggle:hover {
+    transform: scale(1.1);
+    background: var(--primary-hover);
+}
+
+.dark-mode-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Smooth transitions for dark mode */
+body,
+.sidebar,
+.main-content,
+.content-header,
+.tasks-container,
+.add-task-form,
+.tasks-list,
+.task-item,
+.modal-content,
+.stat-card,
+.btn-icon {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
